@@ -1,19 +1,28 @@
 from bs4 import BeautifulSoup
 import os
 import re
+import string
 import nltk
 
 FILE_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'gap_html'))
 
 
 def page_to_words(raw_page):
+    raw_page = re.sub('<br\s*?>', '\n', raw_page)
     page_text = BeautifulSoup(raw_page).get_text()
+    # break into lines and remove leading and trailing space on each
+
+    lines = (line.strip() for line in page_text.splitlines())
+    # break multi-headlines into a line each
+    chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+    # drop blank lines
+    text = '\n'.join(chunk for chunk in chunks if chunk)
 
     # 2. Remove non-letters
-    letters_only = re.sub("[^a-zA-Z]", " ", page_text)
+    letters_only = re.sub("[^a-zA-Z]", " ", text, 0, re.UNICODE)
 
     # 3. Remove phrase 'OCR Output'
-    cleaner_text = re.sub('OCR Output', '', letters_only)
+    cleaner_text = re.sub('OCR Output', " ", letters_only)
 
     # 4. Convert to lower case, split into individual words
     words = cleaner_text.lower().split()
@@ -22,7 +31,7 @@ def page_to_words(raw_page):
     stops = set(nltk.corpus.stopwords.words("english"))
 
     # 6. Remove stop words
-    meaningful_words = [w for w in words if not w in stops]
+    meaningful_words = [w for w in words if w not in stops]
 
     # 7. Join the words back into one string separated by space and return the result.
     return " ".join(meaningful_words)
@@ -63,5 +72,9 @@ def recreate_books():
 
             print("")
 
-            with open(os.path.join(FILE_FOLDER, 'cleaned_books', book), 'w') as new_book_name:
+            with open(os.path.join(FILE_FOLDER, 'cleaned_books', book), 'w+') as new_book_name:
                 new_book_name.write(" ".join(book_text))
+
+
+if __name__ == '__main__':
+    recreate_books()
