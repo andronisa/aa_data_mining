@@ -2,7 +2,6 @@ from bs4 import BeautifulSoup
 import os
 import re
 import nltk
-import sys
 
 FILE_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'gap_html'))
 
@@ -66,20 +65,3 @@ def recreate_books():
 
             with open(os.path.join(FILE_FOLDER, 'cleaned_books', book), 'w') as new_book_name:
                 new_book_name.write(" ".join(book_text))
-
-
-if __name__ == '__main__':
-    recreate_books()
-
-# # Get the number of reviews based on the dataframe column size
-#     num_reviews = train["review"].size
-#
-#     # Initialize an empty list to hold the clean reviews
-#     clean_train_reviews = []
-#
-#     # Loop over each review; create an index i that goes from 0 to the length
-#     # of the movie review list
-#     for i in xrange(0, num_reviews):
-#         # Call our function for each one, and add the result to the list of
-#         # clean reviews
-#         clean_train_reviews.append(review_to_words(train["review"][i]))
