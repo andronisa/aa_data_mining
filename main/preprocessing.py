@@ -7,6 +7,7 @@ from nltk.stem.snowball import SnowballStemmer
 from bag_of_words import get_cleaned_books
 
 FILE_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'gap_html'))
+STATIC_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static'))
 
 
 def page_to_words(raw_page):
