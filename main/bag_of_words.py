@@ -1,9 +1,6 @@
 import os
 import numpy as np
-import nltk
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import TfidfVectorizer
-from nltk.stem.porter import PorterStemmer
 
 FILE_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'gap_html', 'cleaned_books'))
 
@@ -15,10 +12,10 @@ def get_cleaned_books():
         for book in clean_books:
             # print book names
             # print(book)
-
-            with open(os.path.join(root, book)) as f:
-                data = f.read()
-                books.append(data)
+            if ".txt" not in book:
+                with open(os.path.join(root, book)) as f:
+                    data = f.read()
+                    books.append(data)
 
     return books
 
