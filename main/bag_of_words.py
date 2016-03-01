@@ -23,35 +23,16 @@ def get_cleaned_books():
     return books
 
 
-def stem_tokens(tokens, stemmer):
-    stemmed = []
-    for item in tokens:
-        stemmed.append(stemmer.stem(item))
-    return stemmed
-
-
-def tokenize(text):
-    tokens = nltk.word_tokenize(text)
-    stems = stem_tokens(tokens, PorterStemmer())
-    return stems
-
-
 def create_bag_of_words(books=list()):
     print "Creating the bag of words...\n"
 
     # Initialize the "CountVectorizer" object, which is scikit-learn's bag of words tool.
 
-    # Without stemming
-    tok = None
-
-    # With Porter stemming
-    # tok = tokenize
-
     vectorizer = CountVectorizer(analyzer="word",
-                                 tokenizer=tok,
+                                 tokenizer=None,
                                  preprocessor=None,
                                  stop_words=None,
-                                 max_features=None)
+                                 max_features=5000)
 
     # fit_transform() does two functions: First, it fits the model
     # and learns the vocabulary; second, it transforms our training data
@@ -79,20 +60,16 @@ def create_bag_of_words(books=list()):
     # print(vocab)
 
     # write all the vocabulary without using stemming in a file
-    with open(os.path.join(FILE_FOLDER, 'vocab_without_porter.txt'), 'w+') as vocab_file:
-        vocab_file.write(" ".join(vocab))
-
-    # write all vocabulary with porter stemming in a file
-    # with open(os.path.join(FILE_FOLDER, 'vocab_with_porter.txt'), 'w+') as vocab_file:
+    # with open(os.path.join(FILE_FOLDER, 'vocab.txt'), 'w+') as vocab_file:
     #     vocab_file.write(" ".join(vocab))
 
-        # Sum up the counts of each vocabulary word
-        # dist = np.sum(train_data_features, axis=0)
-        #
-        # # For each, print the vocabulary word and the number of times it
-        # # appears in the training set
-        # for tag, count in zip(vocab, dist):
-        #     print count, tag
+    # Sum up the counts of each vocabulary word
+    dist = np.sum(train_data_features, axis=0)
+    dist = sorted(dist, reverse=True)
+
+    # For each, print the vocabulary word and the number of times it appears in the training set
+    for tag, count in zip(vocab, dist):
+        print count, tag
 
 
 if __name__ == '__main__':

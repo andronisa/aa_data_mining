@@ -1,17 +1,19 @@
 from bs4 import BeautifulSoup
 import os
 import re
-import string
 import nltk
+from nltk.stem.snowball import SnowballStemmer
 
 FILE_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'gap_html'))
 
 
 def page_to_words(raw_page):
+    # Swap <br> tags with newline character
     raw_page = re.sub('<br\s*?>', '\n', raw_page)
-    page_text = BeautifulSoup(raw_page).get_text()
-    # break into lines and remove leading and trailing space on each
 
+    page_text = BeautifulSoup(raw_page).get_text()
+
+    # break into lines and remove leading and trailing space on each
     lines = (line.strip() for line in page_text.splitlines())
     # break multi-headlines into a line each
     chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
@@ -33,8 +35,38 @@ def page_to_words(raw_page):
     # 6. Remove stop words
     meaningful_words = [w for w in words if w not in stops]
 
-    # 7. Join the words back into one string separated by space and return the result.
-    return " ".join(meaningful_words)
+    # 7. Join the words back into one string separated by space and tokenize/stem
+    cleaned_text = " ".join(meaningful_words)
+    final_book_text = tokenize_and_stem(cleaned_text)
+
+    return final_book_text
+
+
+def tokenize_and_stem(text):
+    stemmer = SnowballStemmer("english")
+
+    # first tokenize by sentence, then by word to ensure that punctuation is caught as it's own token
+    tokens = [word for sent in nltk.sent_tokenize(text) for word in nltk.word_tokenize(sent)]
+    filtered_tokens = []
+
+    # filter out any tokens not containing letters (e.g., numeric tokens, raw punctuation)
+    for token in tokens:
+        if re.search('[a-zA-Z]', token):
+            filtered_tokens.append(token)
+    stems = [stemmer.stem(t) for t in filtered_tokens]
+
+    return " ".join(stems)
+
+
+# def tokenize_only(text):
+#     # first tokenize by sentence, then by word to ensure that punctuation is caught as it's own token
+#     tokens = [word.lower() for sent in nltk.sent_tokenize(text) for word in nltk.word_tokenize(sent)]
+#     filtered_tokens = []
+#     # filter out any tokens not containing letters (e.g., numeric tokens, raw punctuation)
+#     for token in tokens:
+#         if re.search('[a-zA-Z]', token):
+#             filtered_tokens.append(token)
+#     return filtered_tokens
 
 
 def get_books_structure(root_directory):
