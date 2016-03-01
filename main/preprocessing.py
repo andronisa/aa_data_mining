@@ -2,7 +2,9 @@ from bs4 import BeautifulSoup
 import os
 import re
 import nltk
+import pandas as pd
 from nltk.stem.snowball import SnowballStemmer
+from bag_of_words import get_cleaned_books
 
 FILE_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'gap_html'))
 
@@ -36,8 +38,7 @@ def page_to_words(raw_page):
     meaningful_words = [w for w in words if w not in stops]
 
     # 7. Join the words back into one string separated by space and tokenize/stem
-    cleaned_text = " ".join(meaningful_words)
-    final_book_text = tokenize_and_stem(cleaned_text)
+    final_book_text = " ".join(meaningful_words)
 
     return final_book_text
 
@@ -55,18 +56,18 @@ def tokenize_and_stem(text):
             filtered_tokens.append(token)
     stems = [stemmer.stem(t) for t in filtered_tokens]
 
-    return " ".join(stems)
+    return stems
 
 
-# def tokenize_only(text):
-#     # first tokenize by sentence, then by word to ensure that punctuation is caught as it's own token
-#     tokens = [word.lower() for sent in nltk.sent_tokenize(text) for word in nltk.word_tokenize(sent)]
-#     filtered_tokens = []
-#     # filter out any tokens not containing letters (e.g., numeric tokens, raw punctuation)
-#     for token in tokens:
-#         if re.search('[a-zA-Z]', token):
-#             filtered_tokens.append(token)
-#     return filtered_tokens
+def tokenize_only(text):
+    # first tokenize by sentence, then by word to ensure that punctuation is caught as it's own token
+    tokens = [word.lower() for sent in nltk.sent_tokenize(text) for word in nltk.word_tokenize(sent)]
+    filtered_tokens = []
+    # filter out any tokens not containing letters (e.g., numeric tokens, raw punctuation)
+    for token in tokens:
+        if re.search('[a-zA-Z]', token):
+            filtered_tokens.append(token)
+    return filtered_tokens
 
 
 def get_books_structure(root_directory):
@@ -82,6 +83,22 @@ def get_books_structure(root_directory):
     return dir
 
 
+def get_vocab_frame():
+    totalvocab_stemmed = []
+    totalvocab_tokenized = []
+
+    for book_text in get_cleaned_books():
+        stemmed_words = book_text.split()
+        totalvocab_stemmed.extend(stemmed_words)
+    for book_text in get_cleaned_books('tokenized'):
+        tokenized_words = book_text.split()
+        totalvocab_tokenized.extend(tokenized_words)
+
+    vocab_frame = pd.DataFrame({'words': totalvocab_tokenized}, index=totalvocab_stemmed)
+
+    return vocab_frame
+
+
 def recreate_books():
     for parent_dir, books in get_books_structure(FILE_FOLDER).iteritems():
         for book, pages in books.iteritems():
@@ -91,7 +108,8 @@ def recreate_books():
             print("Processing Book: " + book)
             print("")
 
-            book_text = []
+            stemmed_book_pages = []
+            tokenized_book_pages = []
             counter = 0
             for page in sorted(pages):
                 counter += 1
@@ -100,12 +118,20 @@ def recreate_books():
 
                 with open(os.path.join(FILE_FOLDER, book, page), 'r') as f:
                     data = f.read()
-                    book_text.append(page_to_words(data))
+                    page_text = page_to_words(data)
+                    stemmed_book_pages.append(" ".join(tokenize_and_stem(page_text)))
 
-            print("")
+                    tokenized_book_pages.append(" ".join(tokenize_only(page_text)))
 
-            with open(os.path.join(FILE_FOLDER, 'cleaned_books', book), 'w+') as new_book_name:
-                new_book_name.write(" ".join(book_text))
+            print("Stemmed only")
+            with open(os.path.join(FILE_FOLDER, 'cleaned_books', book + "_stemmed"), 'w+') as new_book_name:
+                new_book_name.write(" ".join(stemmed_book_pages))
+
+            print("Tokenized only")
+            with open(os.path.join(FILE_FOLDER, 'cleaned_books', book + "_tokenized"), 'w+') as new_book_name:
+                new_book_name.write(" ".join(tokenized_book_pages))
+
+                print("")
 
 
 if __name__ == '__main__':
