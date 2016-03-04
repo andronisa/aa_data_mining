@@ -36,7 +36,7 @@ def perform_kmeans():
 
 
 def get_num_clusters():
-    num_clusters = 7
+    num_clusters = 5
     return num_clusters
 
 
@@ -106,7 +106,7 @@ def mds(cos_simil_mtr):
     # convert two components as we're plotting points in a two-dimensional plane
     # "precomputed" because we provide a distance matrix
     # we will also specify `random_state` so the plot is reproducible.
-    mds = MDS(n_components=3, dissimilarity="precomputed", random_state=1)
+    mds = MDS(n_components=2, dissimilarity="precomputed", random_state=1)
 
     pos = mds.fit_transform(cos_simil_mtr)  # shape (n_components, n_samples)
 

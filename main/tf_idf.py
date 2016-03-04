@@ -1,6 +1,7 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from bag_of_words import get_cleaned_books
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.metrics.pairwise import linear_kernel
 
 
 def perform_tf_idf():
@@ -28,18 +29,18 @@ def get_terms_from_tf_idf(tfidf_vectorizer):
 
 
 def get_cosine_similarity(tfidf_matr):
-    dist = 1 - cosine_similarity(tfidf_matr)
+    dist = 1 - cosine_similarity(tfidf_matr, tfidf_matr)
 
     return dist
 
 
 if __name__ == '__main__':
     tfidf_matr, tfidf_vectorizer = perform_tf_idf()
-    print(tfidf_matr.shape)
-    print(tfidf_matr)
-
-    tfidf_terms = get_terms_from_tf_idf(tfidf_vectorizer)
-    print(tfidf_terms)
+    # print(tfidf_matr.shape)
+    # print(tfidf_matr)
+    #
+    # tfidf_terms = get_terms_from_tf_idf(tfidf_vectorizer)
+    # print(tfidf_terms)
 
     cos_sim = get_cosine_similarity(tfidf_matr)
     print(type(cos_sim))
