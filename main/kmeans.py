@@ -13,7 +13,7 @@ from sklearn.externals import joblib
 
 from bag_of_words import get_cleaned_books, get_book_names, FILE_FOLDER
 from preprocessing import get_vocab_frame, STATIC_FOLDER
-from tf_idf import perform_tf_idf, get_terms_from_tf_idf, get_cosine_similarity
+from tf_idf import perform_tf_idf, get_terms_from_tf_idf, get_cosine_similarity, get_kernel_types
 
 
 def perform_kmeans():
@@ -36,7 +36,7 @@ def perform_kmeans():
 
 
 def get_num_clusters():
-    num_clusters = 5
+    num_clusters = 8
     return num_clusters
 
 
@@ -124,7 +124,8 @@ def plot_clusters(clusters, book_titles, xs, ys):
                      3: 'Fourth Cluster',
                      4: 'Fifth Cluster',
                      5: 'Sixth Cluster',
-                     6: 'Eleventh Cluster'}
+                     6: 'Eleventh Cluster',
+                     7: 'Eighth Cluster'}
 
     # create data frame that has the result of the MDS plus the cluster numbers and titles
     df = pd.DataFrame(dict(x=xs, y=ys, label=clusters, title=book_titles))
@@ -169,28 +170,6 @@ def plot_clusters(clusters, book_titles, xs, ys):
     plt.close()
 
 
-def plot_hierarchical_clustering(cos_simil_matr, book_titles):
-    from scipy.cluster.hierarchy import ward, dendrogram
-
-    # define the linkage_matrix using ward clustering pre-computed distances
-    linkage_matrix = ward(cos_simil_matr)
-
-    fig, ax = plt.subplots(figsize=(15, 20))  # set size
-    ax = dendrogram(linkage_matrix, orientation="right", labels=book_titles)
-
-    plt.tick_params(
-        axis='x',  # changes apply to the x-axis
-        which='both',  # both major and minor ticks are affected
-        bottom='off',  # ticks along the bottom edge are off
-        top='off',  # ticks along the top edge are off
-        labelbottom='off')
-
-    plt.tight_layout()  # show plot with tight layout
-
-    plt.savefig(os.path.join(STATIC_FOLDER, 'ward_clusters.png'), dpi=200)  # save figure as ward_clusters
-    plt.close()
-
-
 if __name__ == '__main__':
     kmeans_model, tfidf_matrix, tfidf_vectorizer = perform_kmeans()
 
@@ -198,11 +177,13 @@ if __name__ == '__main__':
     terms = get_terms_from_tf_idf(tfidf_vectorizer)
     fancy_print(kmeans_model, terms, frame)
 
-    cos_similarity_mtr = get_cosine_similarity(tfidf_matrix)
-    mds_xs, mds_ys = mds(cos_similarity_mtr)
+    for kernel in get_kernel_types():
+        print("HC with: " + kernel)
 
-    clusters = get_clusters(kmeans_model)
-    titles = get_book_names()
-    plot_clusters(clusters, titles, mds_xs, mds_ys)
+        cos_similarity_mtr = get_cosine_similarity(tfidf_matrix, kernel)
+        mds_xs, mds_ys = mds(cos_similarity_mtr)
 
-    plot_hierarchical_clustering(cos_similarity_mtr, titles)
+        clusters = get_clusters(kmeans_model)
+        titles = get_book_names()
+
+        plot_clusters(clusters, titles, mds_xs, mds_ys)

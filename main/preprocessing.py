@@ -200,7 +200,6 @@ def recreate_books():
                     data = f.read()
                     page_text = page_to_words(data)
                     stemmed_book_pages.append(" ".join(tokenize_and_stem(page_text)))
-
                     tokenized_book_pages.append(" ".join(tokenize_only(page_text)))
 
             book_name = map_book_name(book)
