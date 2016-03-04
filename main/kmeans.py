@@ -1,7 +1,6 @@
 from __future__ import print_function
 
 import os
-import random
 
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -37,7 +36,7 @@ def perform_kmeans():
 
 
 def get_num_clusters():
-    num_clusters = 4
+    num_clusters = 7
     return num_clusters
 
 
@@ -107,7 +106,7 @@ def mds(cos_simil_mtr):
     # convert two components as we're plotting points in a two-dimensional plane
     # "precomputed" because we provide a distance matrix
     # we will also specify `random_state` so the plot is reproducible.
-    mds = MDS(n_components=2, dissimilarity="precomputed", random_state=1)
+    mds = MDS(n_components=3, dissimilarity="precomputed", random_state=1)
 
     pos = mds.fit_transform(cos_simil_mtr)  # shape (n_components, n_samples)
 
@@ -118,17 +117,14 @@ def mds(cos_simil_mtr):
 
 
 def plot_clusters(clusters, book_titles, xs, ys):
-    # set up colors per clusters using a dict
-    cluster_colors = {0: '#1b9e77', 1: '#d95f02', 2: '#7570b3', 3: '#e7298a', 4: '#66a61e'}
-
     # set up cluster names using a dict
     cluster_names = {0: 'First Cluster',
                      1: 'Second Cluster',
                      2: 'Third Cluster',
                      3: 'Fourth Cluster',
                      4: 'Fifth Cluster',
-                     5: 'Sixth Cluster'}
-    # Next, I plot the labeled observations (films, film titles) colored by cluster using matplotlib. I won't get into too much detail about the matplotlib plot, but I tried to provide some helpful commenting.
+                     5: 'Sixth Cluster',
+                     6: 'Eleventh Cluster'}
 
     # create data frame that has the result of the MDS plus the cluster numbers and titles
     df = pd.DataFrame(dict(x=xs, y=ys, label=clusters, title=book_titles))
@@ -141,7 +137,6 @@ def plot_clusters(clusters, book_titles, xs, ys):
     ax.margins(0.05)  # Optional, just adds 5% padding to the autoscaling
 
     # iterate through groups to layer the plot
-    # note that I use the cluster_name and cluster_color dicts with the 'name' lookup to return the appropriate color/label
     i = 0
     for name, group in groups:
         i += 1
@@ -162,13 +157,14 @@ def plot_clusters(clusters, book_titles, xs, ys):
             top='off',  # ticks along the top edge are off
             labelleft='off')
 
-    ax.legend(numpoints=1)  # show legend with only 1 point
+    # ax.legend(numpoints=1)  # show legend with only 1 point
 
     # add label in x,y position with the label as the film title
     for i in range(len(df)):
         ax.text(df.ix[i]['x'], df.ix[i]['y'], df.ix[i]['title'], size=8)
 
     plt.show()  # show the plot
+
     plt.savefig(os.path.join(STATIC_FOLDER, '2d_clusters.png'), dpi=200)
     plt.close()
 
@@ -191,7 +187,6 @@ def plot_hierarchical_clustering(cos_simil_matr, book_titles):
 
     plt.tight_layout()  # show plot with tight layout
 
-    # uncomment below to save figure
     plt.savefig(os.path.join(STATIC_FOLDER, 'ward_clusters.png'), dpi=200)  # save figure as ward_clusters
     plt.close()
 

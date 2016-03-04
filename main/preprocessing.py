@@ -10,6 +10,57 @@ FILE_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'dat
 STATIC_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static'))
 
 
+def map_book_name(book):
+    books = {
+        'gap_2X5KAAAAYAAJ': 'WorksOfCorneliusTacitus-Book-1',
+        'gap_9ksIAAAAQAAJ': 'PeloponnesianWar-Book-1',
+        'gap_aLcWAAAAQAAJ': 'DeclineAndFallOfRomanEmpire-Book-1',
+        'gap_Bdw_AAAAYAAJ': 'HistoryOfRome-Titus-Livius-Book-1',
+        'gap_-C0BAAAAQAAJ': 'DictionaryOfGreekAndRomanGeography',
+        'gap_CnnUAAAAMAAJ': 'JewishAntiquities-Book-1',
+        'gap_CSEUAAAAYAAJ': 'DeclineAndFallOfRomanEmpire-Book-2',
+        'gap_DhULAAAAYAAJ': 'TheDescriptionOfGreece-Book-9',
+        'gap_dIkBAAAAQAAJ': 'HistoryOfRome-Book-1',
+        'gap_DqQNAAAAYAAJ': 'HistoryOfRome-Book-2',
+        'gap_fnAMAAAAYAAJ': 'PeloponnesianWar-Book-2',
+        'gap_GIt0HMhqjRgC': 'DeclineAndFallOfRomanEmpire-Book-3',
+        'gap_IlUMAQAAMAAJ': 'DeclineAndFallOfRomanEmpire-Book-4',
+        'gap_m_6B1DkImIoC': 'HistoryOfRome-Titus-Livius-Book-2',
+        'gap_MEoWAAAAYAAJ': 'WorksOfCorneliusTacitus-Book-2',
+        'gap_ogsNAAAAIAAJ': 'JewishAntiquities-Book-2',
+        'gap_pX5KAAAAYAAJ': 'WorksOfCorneliusTacitus-Book-3',
+        'gap_RqMNAAAAYAAJ': 'HistoryOfRome-Book-3',
+        'gap_TgpMAAAAYAAJ': 'JewishAntiquities-Book-3',
+        'gap_udEIAAAAQAAJ': 'NaturalHistoryOfPliny-Book-1',
+        'gap_VPENAAAAQAAJ': 'HistoryOfRome-Book-4',
+        'gap_WORMAAAAYAAJ': 'WorksOfCorneliusTacitus-Book-4',
+        'gap_XmqHlMECi6kC': 'DeclineAndFallOfRomanEmpire-Book-4',
+        'gap_y-AvAAAAYAAJ': 'JewishAntiquities-Book-3',
+    }
+
+    return books[book]
+
+
+def simple_page(raw_page):
+    raw_page = re.sub('<br\s*?>', '\n', raw_page)
+    page_text = BeautifulSoup(raw_page).get_text()
+
+    # break into lines and remove leading and trailing space on each
+    lines = (line.strip() for line in page_text.splitlines())
+    # break multi-headlines into a line each
+    chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+    # drop blank lines
+    text = '\n'.join(chunk for chunk in chunks if chunk)
+
+    letters_only = re.sub("[^a-zA-Z]", " ", text, 0, re.UNICODE)
+    # 3. Remove phrase 'OCR Output'
+    cleaner_text = re.sub('OCR Output', " ", letters_only)
+    words = cleaner_text.lower().split()
+    final_book_text = " ".join(words)
+
+    return final_book_text
+
+
 def page_to_words(raw_page):
     # Swap <br> tags with newline character
     raw_page = re.sub('<br\s*?>', '\n', raw_page)
@@ -100,6 +151,34 @@ def get_vocab_frame():
     return vocab_frame
 
 
+def get_first_20_pages():
+    for parent_dir, books in get_books_structure(FILE_FOLDER).iteritems():
+        for book, pages in books.iteritems():
+            if book == 'cleaned_books':
+                continue
+
+            print("Processing Book: " + book)
+            print("")
+
+            first_fifty_pages = []
+            counter = 0
+            for page in sorted(pages):
+                counter += 1
+                if counter == 20:
+                    break
+
+                with open(os.path.join(FILE_FOLDER, book, page), 'r') as f:
+                    data = f.read()
+                    page_text = simple_page(data)
+                    first_fifty_pages.append(page_text)
+
+            book_name = map_book_name(book)
+
+            print("First Pages Only")
+            with open(os.path.join(FILE_FOLDER, 'cleaned_books', book_name + "_first_pages"), 'w+') as new_book_name:
+                new_book_name.write(" ".join(first_fifty_pages))
+
+
 def recreate_books():
     for parent_dir, books in get_books_structure(FILE_FOLDER).iteritems():
         for book, pages in books.iteritems():
@@ -124,12 +203,14 @@ def recreate_books():
 
                     tokenized_book_pages.append(" ".join(tokenize_only(page_text)))
 
+            book_name = map_book_name(book)
+
             print("Stemmed only")
-            with open(os.path.join(FILE_FOLDER, 'cleaned_books', book + "_stemmed"), 'w+') as new_book_name:
+            with open(os.path.join(FILE_FOLDER, 'cleaned_books', book_name + "_stemmed"), 'w+') as new_book_name:
                 new_book_name.write(" ".join(stemmed_book_pages))
 
             print("Tokenized only")
-            with open(os.path.join(FILE_FOLDER, 'cleaned_books', book + "_tokenized"), 'w+') as new_book_name:
+            with open(os.path.join(FILE_FOLDER, 'cleaned_books', book_name + "_tokenized"), 'w+') as new_book_name:
                 new_book_name.write(" ".join(tokenized_book_pages))
 
                 print("")
@@ -137,3 +218,4 @@ def recreate_books():
 
 if __name__ == '__main__':
     recreate_books()
+    get_first_20_pages()

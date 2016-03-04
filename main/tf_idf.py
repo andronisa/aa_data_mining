@@ -35,12 +35,12 @@ def get_cosine_similarity(tfidf_matr):
 
 if __name__ == '__main__':
     tfidf_matr, tfidf_vectorizer = perform_tf_idf()
-    # print(tfidf_matrix.shape)
-    # print(tfidf_matr)
+    print(tfidf_matr.shape)
+    print(tfidf_matr)
 
-    # tfidf_terms = get_terms_from_tf_idf(tfidf_vectorizer)
-    # print(tfidf_terms)
+    tfidf_terms = get_terms_from_tf_idf(tfidf_vectorizer)
+    print(tfidf_terms)
 
     cos_sim = get_cosine_similarity(tfidf_matr)
-    # print(type(cos_sim))
-    # print(cos_sim)
+    print(type(cos_sim))
+    print(cos_sim)
