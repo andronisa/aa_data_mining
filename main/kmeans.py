@@ -84,8 +84,9 @@ def fancy_print(km_model, terms, frame):
         print("Cluster %d top 20 words:" % i, end='')
 
         for ind in order_centroids[i, :20]:  # replace 6 with n words per cluster
-            print(' %s' % vocab_frame.ix[terms[ind].split(' ')].values.tolist()[0][0].encode('utf-8', 'ignore'),
-                  end=',')
+            pass
+            # print(' %s' % vocab_frame.ix[terms[ind].split(' ')].values.tolist()[0][0].encode('utf-8', 'ignore'),
+                  # end=',')
         print()  # add whitespace
 
         print("Cluster %d titles:" % i, end='')

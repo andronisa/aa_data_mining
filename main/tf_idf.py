@@ -22,12 +22,12 @@ def get_kernel_types():
 def perform_tf_idf():
     print("Getting cleaned books...")
     books = get_cleaned_books()
-    max_features = 100000
+    max_features = 50000
 
     # define vectorizer parameters
     print("Setup TF-IDF Vectorizer")
     tfidf_vectorizer = TfidfVectorizer(max_df=0.7, max_features=max_features,
-                                       min_df=0.1, stop_words=None,
+                                       min_df=0.2, stop_words=None,
                                        use_idf=True, tokenizer=None)
 
     print("Perform TF-IDF on the books -- Max features = " + str(max_features))
