@@ -66,6 +66,7 @@ def perform_semantic_hc():
 
     for method in get_hc_methods():
         title = "HC with semantic analysis and " + method
+        print(title)
 
         plot_hierarchical_clustering(
             similarity_matrix,
@@ -100,7 +101,7 @@ def plot_hierarchical_clustering(cos_simil_matr, book_titles, kernel_type, metho
         labelbottom='off')
 
     plt.tight_layout()  # show plot with tight layout
-    # plt.show()
+    plt.show()
 
     plt.savefig(os.path.join(STATIC_FOLDER,
                              'hc_dendrogram' + '_' + kernel_type + '_' + method_type + nlp_tag + '.png'), dpi=200)
@@ -108,5 +109,5 @@ def plot_hierarchical_clustering(cos_simil_matr, book_titles, kernel_type, metho
 
 
 if __name__ == '__main__':
-    # perform_hierarchical_clustering(use_nlp=False, use_nlp_sparse_matrix=False)
+    perform_hierarchical_clustering(use_nlp=False, use_nlp_sparse_matrix=False)
     perform_semantic_hc()

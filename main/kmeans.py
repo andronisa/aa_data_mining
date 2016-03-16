@@ -9,7 +9,6 @@ import pandas as pd
 
 from sklearn.cluster import KMeans
 from sklearn.manifold import MDS
-from sklearn.externals import joblib
 from sklearn.decomposition import PCA
 
 from bag_of_words import get_cleaned_books, get_book_names, FILE_FOLDER
@@ -192,6 +191,9 @@ if __name__ == '__main__':
         titles = get_book_names()
 
         # Without PCA
+        print("")
+        print("")
+        print("")
         title = "MDS with Kmeans"
         cos_simil_mtr = get_similarity_matrix(tfidf_matrix, kernel)
         mds_xs, mds_ys = mds(cos_simil_mtr)

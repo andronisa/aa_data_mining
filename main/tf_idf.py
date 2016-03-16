@@ -23,6 +23,8 @@ def get_kernel_types():
 def perform_tf_idf(use_nlp=False):
     print("Getting cleaned books...")
 
+    gram_range = None
+
     if use_nlp:
         handler = NLPHandler()
         books = handler.parse_nlp_results()
@@ -35,11 +37,12 @@ def perform_tf_idf(use_nlp=False):
     print("Setup TF-IDF Vectorizer")
     tfidf_vectorizer = TfidfVectorizer(max_df=0.7, max_features=max_features,
                                        min_df=0.2, stop_words=None,
-                                       use_idf=True, tokenizer=None)
+                                       use_idf=True, tokenizer=None, ngram_range=gram_range)
 
-    print("Perform TF-IDF on the books -- Max features = " + str(max_features))
+    print("Perform TF-IDF on the books -- Max features = " + str(max_features) + " - n-grams: " + str(gram_range))
 
     tfidf_matrix = tfidf_vectorizer.fit_transform(books)  # fit the vectorizer to books
+    print(tfidf_matrix.shape)
 
     return tfidf_matrix, tfidf_vectorizer
 
