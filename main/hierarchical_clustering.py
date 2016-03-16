@@ -14,11 +14,12 @@ from sklearn.externals import joblib
 from bag_of_words import get_cleaned_books, get_book_names, FILE_FOLDER
 from preprocessing import get_vocab_frame, STATIC_FOLDER
 from tf_idf import perform_tf_idf, get_terms_from_tf_idf, get_cosine_similarity, get_kernel_types
+from nlp import NLPHandler
 
 
 def get_hc_methods():
     return [
-        'single', 
+        'single',
         'complete',
         'average',
         'weighted',
@@ -28,16 +29,26 @@ def get_hc_methods():
     ]
 
 
-def perform_hierarchical_clustering(use_nlp=False):
+def perform_hierarchical_clustering(use_nlp=False, use_nlp_sparse_matrix=False):
     print("Start performing Hierarchical clustering")
-    tfidf_matrix, tfidf_vectorizer = perform_tf_idf(use_nlp)
+
+    if use_nlp_sparse_matrix:
+        handler = NLPHandler()
+        tfidf_matrix = handler.create_sparse_matrix()
+    else:
+        tfidf_matrix, tfidf_vectorizer = perform_tf_idf(use_nlp)
 
     titles = get_book_names()
 
     for kernel in get_kernel_types():
         for method in get_hc_methods():
-            with_nlp_tag = "_with_nlp" if use_nlp else "without_nlp"
-            title = "HC with: " + kernel + " _ " + method + with_nlp_tag
+
+            if use_nlp:
+                nlp_tag = '_with_nlp_sparse_matr' if use_nlp_sparse_matrix else '_with_nlp'
+            else:
+                nlp_tag = '_without_nlp_sparse_matr' if use_nlp_sparse_matrix else '_without_nlp'
+
+            title = "HC with: " + kernel + " _ " + method + nlp_tag
             print(title)
 
             cos_similarity_mtr = get_cosine_similarity(tfidf_matrix, kernel)
@@ -47,11 +58,11 @@ def perform_hierarchical_clustering(use_nlp=False):
                 kernel_type=kernel,
                 method_type=method,
                 title=title,
-                with_nlp_tag=with_nlp_tag
+                nlp_tag=nlp_tag
             )
 
 
-def plot_hierarchical_clustering(cos_simil_matr, book_titles, kernel_type, method_type, title, with_nlp_tag):
+def plot_hierarchical_clustering(cos_simil_matr, book_titles, kernel_type, method_type, title, nlp_tag):
     from scipy.cluster.hierarchy import ward, dendrogram, linkage
 
     plt.close('all')
@@ -75,8 +86,9 @@ def plot_hierarchical_clustering(cos_simil_matr, book_titles, kernel_type, metho
     # plt.show()
 
     plt.savefig(os.path.join(STATIC_FOLDER,
-                             'hc_dendrogram' + '_' + kernel_type + '_' + method_type + with_nlp_tag + '.png'), dpi=200)
+                             'hc_dendrogram' + '_' + kernel_type + '_' + method_type + nlp_tag + '.png'), dpi=200)
     plt.close()
 
+
 if __name__ == '__main__':
-    perform_hierarchical_clustering(True)
+    perform_hierarchical_clustering(False, True)

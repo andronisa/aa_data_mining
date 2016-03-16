@@ -123,11 +123,55 @@ class NLPHandler(object):
 
         return nlp_stemmed_texts
 
+    @staticmethod
+    def create_sparse_matrix():
+        file_path = os.path.join(FILE_FOLDER, 'nlp_files')
+        nlp_matrix = []
+        nlp_big_matr = []
+
+        for root, dirs, json_results in sorted(os.walk(file_path)):
+            for book_res in sorted(json_results):
+                with open(os.path.join(FILE_FOLDER, 'nlp_files', book_res)) as book_nlp_result:
+                    result = json.load(book_nlp_result)
+                    for concept in result['concepts']:
+                        conc = concept['text'].lower()
+                        if conc not in nlp_matrix:
+                            nlp_matrix.append(conc)
+                    for keyword in result['keywords']:
+                        keyw = keyword['text'].lower()
+                        if keyw not in nlp_matrix:
+                            nlp_matrix.append(keyw)
+
+            for book_result in sorted(json_results):
+                with open(os.path.join(FILE_FOLDER, 'nlp_files', book_result)) as book_nlp_result:
+                    new_matr = nlp_matrix[:]
+                    book_words = {}
+                    nlp_result = json.load(book_nlp_result)
+
+                    for concept in nlp_result['concepts']:
+                        conc = concept['text'].lower()
+                        if conc not in book_words:
+                            book_words[conc] = concept['relevance']
+                    for keyword in nlp_result['keywords']:
+                        keyw = keyword['text'].lower()
+                        if keyw not in book_words:
+                            book_words[keyw] = keyword['relevance']
+
+                    for wrd_key, wrd in enumerate(new_matr):
+                        if wrd in book_words:
+                            new_matr[wrd_key] = book_words[wrd]
+                        else:
+                            new_matr[wrd_key] = 0
+                    nlp_big_matr.append(new_matr)
+
+        return nlp_big_matr
+
 
 if __name__ == '__main__':
     nlp_handler = NLPHandler()
-    nlp_handler.run_handler()
-    nlp_handler.print_nlp_results()
-    nlp_stemmed_books = nlp_handler.parse_nlp_results()
+    # nlp_handler.run_handler()
+    # nlp_handler.print_nlp_results()
+    # nlp_stemmed_books = nlp_handler.parse_nlp_results()
+    nlp_matr = nlp_handler.create_sparse_matrix()
 
-    print(nlp_stemmed_books)
+    print(nlp_matr)
