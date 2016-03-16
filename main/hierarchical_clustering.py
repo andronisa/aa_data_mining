@@ -5,16 +5,12 @@ import os
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import matplotlib as mpl
-import pandas as pd
 
-from sklearn.cluster import KMeans
-from sklearn.manifold import MDS
-from sklearn.externals import joblib
-
-from bag_of_words import get_cleaned_books, get_book_names, FILE_FOLDER
-from preprocessing import get_vocab_frame, STATIC_FOLDER
-from tf_idf import perform_tf_idf, get_terms_from_tf_idf, get_cosine_similarity, get_kernel_types
+from bag_of_words import get_book_names
+from preprocessing import STATIC_FOLDER
+from tf_idf import perform_tf_idf, get_similarity_matrix, get_kernel_types
 from nlp import NLPHandler
+from semantic import run_semantic_analysis
 
 
 def get_hc_methods():
@@ -51,7 +47,7 @@ def perform_hierarchical_clustering(use_nlp=False, use_nlp_sparse_matrix=False):
             title = "HC with: " + kernel + " _ " + method + nlp_tag
             print(title)
 
-            cos_similarity_mtr = get_cosine_similarity(tfidf_matrix, kernel)
+            cos_similarity_mtr = get_similarity_matrix(tfidf_matrix, kernel)
             plot_hierarchical_clustering(
                 cos_similarity_mtr,
                 titles,
@@ -62,12 +58,33 @@ def perform_hierarchical_clustering(use_nlp=False, use_nlp_sparse_matrix=False):
             )
 
 
+def perform_semantic_hc():
+    print("Start performing Hierarchical clustering with semantic analysis")
+    titles = get_book_names()
+
+    similarity_matrix = run_semantic_analysis()
+
+    for method in get_hc_methods():
+        title = "HC with semantic analysis and " + method
+
+        plot_hierarchical_clustering(
+            similarity_matrix,
+            titles,
+            kernel_type="semantic",
+            method_type=method,
+            title=title,
+            nlp_tag=""
+        )
+
+
 def plot_hierarchical_clustering(cos_simil_matr, book_titles, kernel_type, method_type, title, nlp_tag):
     from scipy.cluster.hierarchy import ward, dendrogram, linkage
 
     plt.close('all')
+
     # define the linkage_matrix using ward clustering pre-computed distances
     # linkage_matrix = ward(cos_simil_matr)
+
     linkage_matrix = linkage(cos_simil_matr, method=method_type)
 
     fig, ax = plt.subplots(figsize=(15, 20))  # set size
@@ -91,4 +108,5 @@ def plot_hierarchical_clustering(cos_simil_matr, book_titles, kernel_type, metho
 
 
 if __name__ == '__main__':
-    perform_hierarchical_clustering(False, True)
+    # perform_hierarchical_clustering(use_nlp=False, use_nlp_sparse_matrix=False)
+    perform_semantic_hc()

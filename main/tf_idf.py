@@ -63,7 +63,7 @@ def get_kernel(kernel_name):
     return options[kernel_name]
 
 
-def get_cosine_similarity(tfidf_matr, kernel):
+def get_similarity_matrix(tfidf_matr, kernel):
     dist = 1 - get_kernel(kernel)(tfidf_matr)
 
     return dist
@@ -77,6 +77,6 @@ if __name__ == '__main__':
     # tfidf_terms = get_terms_from_tf_idf(tfidf_vectorizer)
     # print(tfidf_terms)
 
-    cos_sim = get_cosine_similarity(tfidf_matr)
+    cos_sim = get_similarity_matrix(tfidf_matr)
     print(type(cos_sim))
     print(cos_sim)

@@ -14,7 +14,7 @@ from sklearn.decomposition import PCA
 
 from bag_of_words import get_cleaned_books, get_book_names, FILE_FOLDER
 from preprocessing import get_vocab_frame, STATIC_FOLDER
-from tf_idf import perform_tf_idf, get_terms_from_tf_idf, get_cosine_similarity, get_kernel_types
+from tf_idf import perform_tf_idf, get_terms_from_tf_idf, get_similarity_matrix, get_kernel_types
 
 
 def perform_kmeans():
@@ -98,7 +98,6 @@ def fancy_print(km_model, terms, frame):
 
 
 def mds(cos_simil_mtr):
-    MDS()
     # convert two components as we're plotting points in a two-dimensional plane
     # "precomputed" because we provide a distance matrix
     # we will also specify `random_state` so the plot is reproducible.
@@ -112,14 +111,28 @@ def mds(cos_simil_mtr):
     return xs, ys
 
 
-def plot_clusters(clusters, book_titles, xs, ys):
+def pca(tfidf_matr):
+    # convert two components as we're plotting points in a two-dimensional plane
+    # "precomputed" because we provide a distance matrix
+    # we will also specify `random_state` so the plot is reproducible.
+    pca = PCA(n_components=2000, copy=True)
+    pca.fit(tfidf_matr.toarray())  # shape (n_components, n_samples)
+
+    new_tf_idf_matr = pca.transform(tfidf_matr.toarray())
+
+    return new_tf_idf_matr
+
+
+def plot_clusters(clusters, book_titles, xs, ys, title):
     # set up cluster names using a dict
-    cluster_names = {0: 'First Cluster',
-                     1: 'Second Cluster',
-                     2: 'Third Cluster',
-                     3: 'Fourth Cluster',
-                     4: 'Fifth Cluster',
-                     5: 'Sixth Cluster'}
+    cluster_names = {
+        0: 'First Cluster',
+        1: 'Second Cluster',
+        2: 'Third Cluster',
+        3: 'Fourth Cluster',
+        4: 'Fifth Cluster',
+        5: 'Sixth Cluster'
+    }
 
     # create data frame that has the result of the MDS plus the cluster numbers and titles
     df = pd.DataFrame(dict(x=xs, y=ys, label=clusters, title=book_titles))
@@ -129,6 +142,7 @@ def plot_clusters(clusters, book_titles, xs, ys):
 
     # set up plot
     fig, ax = plt.subplots(figsize=(17, 9))  # set size
+    fig.canvas.set_window_title(title)
     ax.margins(0.05)  # Optional, just adds 5% padding to the autoscaling
 
     # iterate through groups to layer the plot
@@ -174,9 +188,19 @@ if __name__ == '__main__':
     for kernel in get_kernel_types():
         print("HC with: " + kernel)
 
-        mds_xs, mds_ys = mds(tfidf_matrix)
-
         clusters = get_clusters(kmeans_model)
         titles = get_book_names()
 
-        plot_clusters(clusters, titles, mds_xs, mds_ys)
+        # Without PCA
+        title = "MDS with Kmeans"
+        cos_simil_mtr = get_similarity_matrix(tfidf_matrix, kernel)
+        mds_xs, mds_ys = mds(cos_simil_mtr)
+        plot_clusters(clusters, titles, mds_xs, mds_ys, title=title)
+
+        # With PCA
+        title = "MDS with Kmeans after PCA"
+        new_tf_idf_matrix = pca(tfidf_matrix)
+        cos_simil_mtr_with_pca = get_similarity_matrix(new_tf_idf_matrix, kernel)
+        mds_xs_pca, mds_ys_pca = mds(cos_simil_mtr)
+
+        plot_clusters(clusters, titles, mds_xs, mds_ys, title=title)

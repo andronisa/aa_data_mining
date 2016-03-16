@@ -1,11 +1,14 @@
+import os
 import nltk
-from nltk.corpus import wordnet as wn
-from nltk.corpus import brown
 import math
 import numpy as np
 import sys
+
+from nltk.corpus import wordnet as wn
+from nltk.corpus import brown
 from nlp import NLPHandler
-from bag_of_words import get_book_names, get_cleaned_books
+from sklearn.externals import joblib
+from bag_of_words import get_book_names, get_cleaned_books, FILE_FOLDER
 
 # Parameters to the algorithm. Currently set to values that was reported
 # in the paper to produce "best" results.
@@ -249,27 +252,45 @@ def similarity(sentence_1, sentence_2, info_content_norm):
            (1.0 - DELTA) * word_order_similarity(sentence_1, sentence_2)
 
 
-def run_semantic_analysis():
-    nlp_handler = NLPHandler()
-    books = nlp_handler.parse_nlp_results()
-    # books = get_cleaned_books
+def run_semantic_analysis(nlp_results=True):
+    if os.path.isfile(os.path.join(FILE_FOLDER, 'semantic_matrix.pkl')):
+        print("Detected existing semantic matrix. Loading ... ")
+        semantic_similarity_matrix = joblib.load(os.path.join(FILE_FOLDER, 'semantic_matrix.pkl'))
+    else:
+        if nlp_results:
+            nlp_handler = NLPHandler()
+            books = nlp_handler.parse_nlp_results()
+        else:
+            books = get_cleaned_books
 
-    titles = get_book_names()
+        titles = get_book_names()
 
-    counter = 0
-    for book in books:
-        book_name = titles[counter]
+        big_matr = []
 
-        second_counter = 0
-        for other_book in books:
-            other_book_name = titles[second_counter]
-            print(book_name + " - " + other_book_name)
+        counter = 0
+        for book in books:
+            book_matr = []
+            book_name = titles[counter]
 
-            score = similarity(book, other_book, False)
-            print(score)
-            second_counter += 1
-        counter += 1
+            second_counter = 0
+            for other_book in books:
+                other_book_name = titles[second_counter]
+                print(book_name + " - " + other_book_name)
+
+                score = 1 - similarity(book, other_book, False)
+                print(score)
+
+                book_matr.append(score)
+                second_counter += 1
+            counter += 1
+            big_matr.append(book_matr)
+
+        semantic_similarity_matrix = np.array(big_matr)
+        joblib.dump(semantic_similarity_matrix, os.path.join(FILE_FOLDER, 'semantic_matrix.pkl'))
+
+    return semantic_similarity_matrix
 
 
 if __name__ == '__main__':
-    run_semantic_analysis()
+    # Trying to run without nlp results and normal (big) books takes too much time.
+    run_semantic_analysis(nlp_results=True)
