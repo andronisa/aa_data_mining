@@ -19,29 +19,34 @@ STATIC_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 's
 def map_book_name(book):
     books = {
         'gap_2X5KAAAAYAAJ': 'WorksOfCorneliusTacitus-Book-1',
+        'gap_MEoWAAAAYAAJ': 'WorksOfCorneliusTacitus-Book-2',
+        'gap_pX5KAAAAYAAJ': 'WorksOfCorneliusTacitus-Book-3',
+        'gap_WORMAAAAYAAJ': 'WorksOfCorneliusTacitus-Book-4',
+
         'gap_9ksIAAAAQAAJ': 'PeloponnesianWar-Book-1',
-        'gap_aLcWAAAAQAAJ': 'DeclineAndFallOfRomanEmpire-Book-1',
-        'gap_Bdw_AAAAYAAJ': 'HistoryOfRome-Titus-Livius-Book-1',
-        'gap_-C0BAAAAQAAJ': 'DictionaryOfGreekAndRomanGeography',
-        'gap_CnnUAAAAMAAJ': 'JewishAntiquities-Book-1',
-        'gap_CSEUAAAAYAAJ': 'DeclineAndFallOfRomanEmpire-Book-2',
-        'gap_DhULAAAAYAAJ': 'TheDescriptionOfGreece-Book-9',
-        'gap_dIkBAAAAQAAJ': 'HistoryOfRome-Book-1',
-        'gap_DqQNAAAAYAAJ': 'HistoryOfRome-Book-2',
         'gap_fnAMAAAAYAAJ': 'PeloponnesianWar-Book-2',
+        'gap_DhULAAAAYAAJ': 'TheDescriptionOfGreece-Book-1',
+
+        'gap_aLcWAAAAQAAJ': 'DeclineAndFallOfRomanEmpire-Book-1',
+        'gap_CSEUAAAAYAAJ': 'DeclineAndFallOfRomanEmpire-Book-2',
         'gap_GIt0HMhqjRgC': 'DeclineAndFallOfRomanEmpire-Book-3',
         'gap_IlUMAQAAMAAJ': 'DeclineAndFallOfRomanEmpire-Book-4',
+        'gap_XmqHlMECi6kC': 'DeclineAndFallOfRomanEmpire-Book-5',
+        'gap_VPENAAAAQAAJ': 'DeclineAndFallOfRomanEmpire-Book-6',
+
+        'gap_Bdw_AAAAYAAJ': 'HistoryOfRome-Titus-Livius-Book-1',
         'gap_m_6B1DkImIoC': 'HistoryOfRome-Titus-Livius-Book-2',
-        'gap_MEoWAAAAYAAJ': 'WorksOfCorneliusTacitus-Book-2',
-        'gap_ogsNAAAAIAAJ': 'JewishAntiquities-Book-2',
-        'gap_pX5KAAAAYAAJ': 'WorksOfCorneliusTacitus-Book-3',
-        'gap_RqMNAAAAYAAJ': 'HistoryOfRome-Book-3',
-        'gap_TgpMAAAAYAAJ': 'JewishAntiquities-Book-3',
+        'gap_DqQNAAAAYAAJ': 'HistoryOfRome-Livy-Book-1',
+        'gap_RqMNAAAAYAAJ': 'HistoryOfRome-Livy-Book-2',
+
+        'gap_CnnUAAAAMAAJ': 'Josephus-Book-1',
+        'gap_ogsNAAAAIAAJ': 'Josephus-Book-2',
+        'gap_TgpMAAAAYAAJ': 'Josephus-Book-3',
+        'gap_y-AvAAAAYAAJ': 'Josephus-Book-4',
+
+        'gap_-C0BAAAAQAAJ': 'DictionaryOfGreekAndRomanGeography',
+        'gap_dIkBAAAAQAAJ': 'HistoryOfRome-Book-1',
         'gap_udEIAAAAQAAJ': 'NaturalHistoryOfPliny-Book-1',
-        'gap_VPENAAAAQAAJ': 'HistoryOfRome-Book-4',
-        'gap_WORMAAAAYAAJ': 'WorksOfCorneliusTacitus-Book-4',
-        'gap_XmqHlMECi6kC': 'DeclineAndFallOfRomanEmpire-Book-4',
-        'gap_y-AvAAAAYAAJ': 'JewishAntiquities-Book-3',
     }
 
     return books[book]
@@ -98,14 +103,6 @@ def page_to_words(raw_page):
     # 7. Join the words back into one string separated by space and tokenize/stem
     final_book_text = " ".join(meaningful_words)
 
-    # whole_book_tokens = []
-    # for(each) page:
-    # get the tokens
-    # whole_book_tokens.append(tokens)
-    # whole_book(str, txt) = " ".join(whole_book_tokens)
-    # with open("book.txt", w+) as file:
-    # file.write(whole_book)
-
     return final_book_text
 
 
@@ -141,7 +138,7 @@ def get_books_structure(root_directory):
     rootdir = root_directory.rstrip(os.sep)
     start = rootdir.rfind(os.sep) + 1
 
-    for path, dirs, files in os.walk(rootdir):
+    for path, dirs, files in sorted(os.walk(rootdir)):
         folders = path[start:].split(os.sep)
         subdir = dict.fromkeys(files)
         parent = reduce(dict.get, folders[:-1], dir)
@@ -460,7 +457,7 @@ N = 0
 
 
 if __name__ == '__main__':
-    recreate_books()
+    # recreate_books()
     get_first_20_pages()
 
     # books = get_cleaned_books()

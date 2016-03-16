@@ -28,21 +28,30 @@ def get_hc_methods():
     ]
 
 
-def perform_hierarchical_clustering():
+def perform_hierarchical_clustering(use_nlp=False):
     print("Start performing Hierarchical clustering")
-    tfidf_matrix, tfidf_vectorizer = perform_tf_idf()
+    tfidf_matrix, tfidf_vectorizer = perform_tf_idf(use_nlp)
 
     titles = get_book_names()
 
     for kernel in get_kernel_types():
         for method in get_hc_methods():
-            print("HC with: " + kernel + " _ " + method)
+            with_nlp_tag = "_with_nlp" if use_nlp else "without_nlp"
+            title = "HC with: " + kernel + " _ " + method + with_nlp_tag
+            print(title)
 
             cos_similarity_mtr = get_cosine_similarity(tfidf_matrix, kernel)
-            plot_hierarchical_clustering(cos_similarity_mtr, titles, kernel_type=kernel, method_type=method)
+            plot_hierarchical_clustering(
+                cos_similarity_mtr,
+                titles,
+                kernel_type=kernel,
+                method_type=method,
+                title=title,
+                with_nlp_tag=with_nlp_tag
+            )
 
 
-def plot_hierarchical_clustering(cos_simil_matr, book_titles, kernel_type, method_type):
+def plot_hierarchical_clustering(cos_simil_matr, book_titles, kernel_type, method_type, title, with_nlp_tag):
     from scipy.cluster.hierarchy import ward, dendrogram, linkage
 
     plt.close('all')
@@ -51,7 +60,8 @@ def plot_hierarchical_clustering(cos_simil_matr, book_titles, kernel_type, metho
     linkage_matrix = linkage(cos_simil_matr, method=method_type)
 
     fig, ax = plt.subplots(figsize=(15, 20))  # set size
-    fig.canvas.set_window_title('HC - ' + kernel_type + " - " + method_type) 
+    fig.canvas.set_window_title(title)
+
     ax = dendrogram(linkage_matrix, orientation="right", labels=book_titles)
 
     plt.tick_params(
@@ -62,12 +72,11 @@ def plot_hierarchical_clustering(cos_simil_matr, book_titles, kernel_type, metho
         labelbottom='off')
 
     plt.tight_layout()  # show plot with tight layout
-    plt.show()
+    # plt.show()
 
-    plt.savefig(os.path.join(STATIC_FOLDER, 'hc_dendrogram' + '_' + kernel_type + '_' + method_type +'.png'), dpi=200)
-    # save figure as ward_clusters
-
+    plt.savefig(os.path.join(STATIC_FOLDER,
+                             'hc_dendrogram' + '_' + kernel_type + '_' + method_type + with_nlp_tag + '.png'), dpi=200)
     plt.close()
 
 if __name__ == '__main__':
-    perform_hierarchical_clustering()
+    perform_hierarchical_clustering(True)

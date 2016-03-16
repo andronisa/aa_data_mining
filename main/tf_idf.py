@@ -6,6 +6,7 @@ from sklearn.metrics.pairwise import polynomial_kernel
 from sklearn.metrics.pairwise import sigmoid_kernel
 from sklearn.metrics.pairwise import rbf_kernel
 from sklearn.metrics.pairwise import laplacian_kernel
+from nlp import NLPHandler
 
 
 def get_kernel_types():
@@ -19,9 +20,15 @@ def get_kernel_types():
     ]
 
 
-def perform_tf_idf():
+def perform_tf_idf(use_nlp=False):
     print("Getting cleaned books...")
-    books = get_cleaned_books()
+
+    if use_nlp:
+        handler = NLPHandler()
+        books = handler.parse_nlp_results()
+    else:
+        books = get_cleaned_books()
+
     max_features = 50000
 
     # define vectorizer parameters

@@ -8,24 +8,23 @@ FILE_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'dat
 def get_cleaned_books(type_of_book='stemmed'):
     books = []
 
-    for root, dirs, clean_books in os.walk(FILE_FOLDER):
-        for book in clean_books:
+    for root, dirs, clean_books in sorted(os.walk(FILE_FOLDER)):
+        for book in sorted(clean_books):
             # print(book) # print book names
             if type_of_book in book:
                 with open(os.path.join(root, book)) as f:
                     data = f.read()
                     books.append(data)
-
     return books
 
 
 def get_book_names(type_of_book='stemmed'):
     book_names = []
 
-    for root, dirs, book_files in os.walk(FILE_FOLDER):
-        for book in book_files:
+    for root, dirs, book_files in sorted(os.walk(FILE_FOLDER)):
+        for book in sorted(book_files):
             if type_of_book in book:
-                book_name = book.replace("_stemmed", "")
+                book_name = book.replace("_".join(["",type_of_book]), "")
                 book_names.append(book_name)
 
     return book_names
