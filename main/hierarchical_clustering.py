@@ -1,3 +1,11 @@
+'''
+*    Title: Document Clustering with Python
+*    Author: Rose, B
+*    Date: N/A
+*    Code version: N/A
+*    Availability: http://brandonrose.org/clustering#Tf-idf-and-document-similarity
+*
+'''
 from __future__ import print_function
 
 import os
@@ -109,5 +117,5 @@ def plot_hierarchical_clustering(cos_simil_matr, book_titles, kernel_type, metho
 
 
 if __name__ == '__main__':
-    perform_hierarchical_clustering(use_nlp=False, use_nlp_sparse_matrix=False)
+    # perform_hierarchical_clustering(use_nlp=False, use_nlp_sparse_matrix=False)
     perform_semantic_hc()

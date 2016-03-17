@@ -1,3 +1,12 @@
+'''
+*    Title: Part 1: For Beginners - Bag of Words
+*    Author: Kaggle
+*    Date: Tue 9 Dec 2014
+*    Code version: N/A
+*    Availability: https://www.kaggle.com/c/word2vec-nlp-tutorial/details/part-1-for-beginners-bag-of-words
+*
+'''
+
 import os
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
@@ -24,7 +33,7 @@ def get_book_names(type_of_book='stemmed'):
     for root, dirs, book_files in sorted(os.walk(FILE_FOLDER)):
         for book in sorted(book_files):
             if type_of_book in book:
-                book_name = book.replace("_".join(["",type_of_book]), "")
+                book_name = book.replace("_".join(["", type_of_book]), "")
                 book_names.append(book_name)
 
     return book_names

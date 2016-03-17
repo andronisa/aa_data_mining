@@ -1,3 +1,12 @@
+'''
+*    Title: Computing Semantic Similarity for Short Sentences
+*    Author: Sujit Pal
+*    Date: Thursday, December 04, 2014
+*    Code version: N/A
+*    Availability: http://sujitpal.blogspot.co.uk/2014/12/semantic-similarity-for-short-sentences.html
+*
+'''
+
 import os
 import nltk
 import math

@@ -1,3 +1,13 @@
+'''
+*    Title: Part 1: For Beginners - Bag of Words
+*    Author: Kaggle
+*    Date: Tue 9 Dec 2014
+*    Code version: N/A
+*    Availability: https://www.kaggle.com/c/word2vec-nlp-tutorial/details/part-1-for-beginners-bag-of-words
+*
+'''
+
+
 from __future__ import division
 from bs4 import BeautifulSoup
 import os

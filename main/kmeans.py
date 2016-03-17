@@ -1,3 +1,12 @@
+'''
+*    Title: Document Clustering with Python
+*    Author: Rose, B
+*    Date: N/A
+*    Code version: N/A
+*    Availability: http://brandonrose.org/clustering#Tf-idf-and-document-similarity
+*
+'''
+
 from __future__ import print_function
 
 import os
